@@ -54,8 +54,7 @@ app.post('/mcp', async (req, res) => {
 
     const server = new McpServer({
       name: 'tomorrow-now-decision-tree-advisory',
-      version: '1.0.0',
-      description: 'Crop decision trees for agricultural recommendations based on weather and growth stage - TomorrowNow GAP Platform'
+      version: '1.0.0'
     });
 
     server.tool(
