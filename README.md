@@ -422,6 +422,27 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
+## 🔒 Security
+
+### Database Credentials
+
+**⚠️ CRITICAL: Never commit database credentials to version control!**
+
+- Always use environment variables (`DATABASE_URL`)
+- Railway automatically sets `DATABASE_URL` in production
+- For local development, use Railway CLI or get credentials from Railway Dashboard
+- Never hardcode connection strings in code or documentation
+- If credentials are accidentally committed, **immediately rotate the database password**
+
+### Best Practices
+
+- Use `.env` files (already in `.gitignore`)
+- Never commit `.env.local` or any credential files
+- Use Railway's environment variable management
+- Rotate credentials immediately if exposed
+
+---
+
 ## 📞 Support
 
 - **Issues**: [GitHub Issues](https://github.com/eagleisbatman/tomorrow-now-decision-tree-mcp-server/issues)
