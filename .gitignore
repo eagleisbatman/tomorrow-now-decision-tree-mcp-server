@@ -8,6 +8,9 @@ dist/
 *.xlsx
 *.xls
 
+# Cursor rules (local only, not shared)
+.cursorrules
+
 # Security: Never commit credentials
 *credentials*
 *secrets*
