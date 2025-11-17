@@ -151,7 +151,61 @@ Multiple rules can match simultaneously, providing comprehensive advice.
 2. Run `npm run import` to update database
 3. MCP server automatically includes new crops
 
-## Deployment
+## Railway Deployment
 
-The server is configured for Railway deployment. Set `DATABASE_URL` environment variable in Railway.
+This server is configured for Railway deployment.
+
+### Setup Steps:
+
+1. **Create Railway Project**
+   - Go to [Railway](https://railway.app)
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select `tomorrow-now-decision-tree-mcp-server`
+
+2. **Add PostgreSQL Database**
+   - In Railway project, click "New" → "Database" → "Add PostgreSQL"
+   - Railway will automatically create `DATABASE_URL` environment variable
+
+3. **Run Database Migrations**
+   - After deployment, connect to Railway PostgreSQL
+   - Run: `psql $DATABASE_URL < migrations/001_initial_schema.sql`
+   - Or use Railway's database console
+
+4. **Import Excel Data** (One-time setup)
+   - You'll need to run the import script locally or via Railway CLI:
+   ```bash
+   railway run npm run import
+   ```
+   - Note: Excel file must be in the project root for import
+
+5. **Environment Variables**
+   - `DATABASE_URL` - Automatically set by Railway PostgreSQL
+   - `PORT` - Automatically set by Railway (default: 3001)
+   - `ALLOWED_ORIGINS` - Optional, defaults to '*'
+
+6. **Deploy**
+   - Railway will automatically build and deploy on push to `main`
+   - Build command: `npm run build`
+   - Start command: `npm start`
+
+### Railway Configuration
+
+The `railway.json` file configures:
+- Build command: `npm run build`
+- Start command: `npm start`
+- Restart policy: ON_FAILURE with max 10 retries
+
+### Health Check
+
+After deployment, verify the server:
+```bash
+curl https://your-app-name.up.railway.app/health
+```
+
+### MCP Endpoint
+
+The MCP endpoint will be available at:
+```
+https://your-app-name.up.railway.app/mcp
+```
 
