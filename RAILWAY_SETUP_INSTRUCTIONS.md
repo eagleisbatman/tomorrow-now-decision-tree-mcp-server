@@ -96,17 +96,12 @@ You should see:
 
 ---
 
-## Database Credentials (for reference)
+## Database Credentials
 
-**Public Connection** (works from anywhere):
-```
-postgresql://postgres:lQJdVGMpMYaKhPaOpgSxIfQoKwwSKbsC@switchyard.proxy.rlwy.net:35347/railway
-```
+**Note:** Database credentials are managed by Railway and automatically set via the `DATABASE_URL` environment variable. 
 
-**Internal Connection** (only works from Railway network):
-```
-postgresql://postgres:lQJdVGMpMYaKhPaOpgSxIfQoKwwSKbsC@postgres-f55f407f.railway.internal:5432/railway
-```
+- For local development: Get the public connection string from Railway Dashboard → PostgreSQL → Connect → Public Network
+- For Railway deployment: `DATABASE_URL` is automatically set by Railway
 
-**Note:** Use the public connection string for local development. Railway automatically sets `DATABASE_URL` in the deployed environment.
+**Never commit database credentials to version control!**
 
