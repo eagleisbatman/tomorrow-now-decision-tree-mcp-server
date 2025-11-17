@@ -1,0 +1,204 @@
+# Cursor Rules - Security & Best Practices
+
+## 🚨 CRITICAL: NEVER COMMIT SENSITIVE INFORMATION
+
+### Absolute Prohibitions
+
+**NEVER commit, stage, or include in any file that will be committed:**
+
+1. **Credentials:**
+   - Passwords (e.g., `lQJdVGMpMYaKhPaOpgSxIfQoKwwSKbsC`)
+   - API keys (e.g., `sk_live_...`, `AIzaSy...`)
+   - Tokens (JWT tokens, access tokens, refresh tokens)
+   - API secrets
+   - Database passwords
+   - Encryption keys
+
+2. **Connection Strings:**
+   - PostgreSQL URIs (e.g., `postgresql://user:password@host:port/db`)
+   - MongoDB connection strings
+   - Redis connection strings
+   - Any database connection string with credentials
+   - Railway internal hostnames with credentials
+   - Public proxy URLs with credentials (e.g., `*.proxy.rlwy.net`)
+
+3. **Personal Information:**
+   - Email addresses used as credentials
+   - Usernames when paired with passwords
+   - Personal API credentials
+
+4. **Environment Variables with Real Values:**
+   - Never commit `.env` files with actual values
+   - Never hardcode credentials in code files
+   - Never include credentials in README.md examples
+   - Never include credentials in documentation files
+
+### Mandatory Practices
+
+**ALWAYS:**
+
+1. **Use Environment Variables:**
+   - Store all credentials in `.env` files (already in `.gitignore`)
+   - Reference credentials via `process.env.VARIABLE_NAME`
+   - Use Railway/Heroku environment variables for production
+
+2. **Use Placeholders in Documentation:**
+   - README examples: `postgresql://user:password@host:port/db` → `postgresql://user:YOUR_PASSWORD@host:port/db`
+   - Code comments: `// Set via environment variable`
+   - Never use real credentials even in examples
+
+3. **Validate Before Committing:**
+   - Check `git diff` before every commit
+   - Search for common patterns: `postgresql://`, `password=`, `API_KEY=`, `token=`
+   - Verify `.env` is in `.gitignore`
+   - Scan for email addresses in commit messages
+
+4. **Git History Hygiene:**
+   - Never commit sensitive data, even if planning to remove it later
+   - If accidentally committed, immediately use BFG Repo-Cleaner to remove from history
+   - Force push only after confirming credentials are removed
+
+### File Patterns to Check
+
+**Before committing, verify these files don't contain credentials:**
+
+- `README.md` - Only placeholders allowed
+- `*.md` documentation files - Only examples with placeholders
+- `scripts/*.md` - Setup guides must use placeholders
+- `*.env` - Must be in `.gitignore`
+- `*.config.js` - Use environment variables
+- `package.json` - No credentials in scripts
+- `*.ts` / `*.js` - No hardcoded credentials
+
+### Red Flags to Watch For
+
+**If you see these patterns, STOP and remove credentials:**
+
+- `postgresql://.*:.*@.*` (connection string with password)
+- `password=.*[A-Za-z0-9@#$%]{8,}` (password pattern)
+- `API_KEY=.*[A-Za-z0-9]{20,}` (API key pattern)
+- `token=.*[A-Za-z0-9]{20,}` (token pattern)
+- `*.proxy.rlwy.net.*:.*` (Railway proxy with credentials)
+- `*.railway.internal.*:.*` (Railway internal with credentials)
+
+### Pre-Commit Checklist
+
+**Before every commit, verify:**
+
+- [ ] No `.env` files staged (`git status` should not show `.env`)
+- [ ] No hardcoded passwords in code
+- [ ] No real credentials in README or documentation
+- [ ] All examples use placeholders (`YOUR_PASSWORD`, `your-api-key`, etc.)
+- [ ] Environment variables are referenced via `process.env.*`
+- [ ] `.gitignore` includes `.env` and sensitive files
+
+### If Credentials Are Accidentally Committed
+
+**IMMEDIATE ACTIONS:**
+
+1. **DO NOT PANIC** - Act quickly but carefully
+2. **Remove from current files** - Edit and commit fix immediately
+3. **Clean git history** - Use BFG Repo-Cleaner:
+   ```bash
+   echo "credential_to_remove" > /tmp/credentials.txt
+   bfg --replace-text /tmp/credentials.txt
+   git reflog expire --expire=now --all
+   git gc --prune=now --aggressive
+   git push --force --all
+   ```
+4. **Change credentials** - Rotate passwords/keys immediately
+5. **Notify security team** - If applicable
+
+### Code Review Guidelines
+
+**When reviewing code:**
+
+- Scan for hardcoded credentials
+- Verify environment variables are used correctly
+- Check documentation uses placeholders
+- Ensure `.gitignore` includes sensitive files
+- Verify no credentials in commit messages
+
+### Project-Specific Rules
+
+**For MCP Servers:**
+
+- All API keys must come from environment variables
+- `.env` files must be in `.gitignore`
+- README examples must use placeholders
+- Railway environment variables for production deployment
+- Never commit test credentials
+
+**For Database Setup Scripts:**
+
+- Never include connection strings in documentation
+- Use `process.env.DATABASE_URL` in code
+- Setup guides should reference Railway Dashboard for credentials
+- Never show actual passwords in examples
+
+## 📝 Documentation Management
+
+**CRITICAL: Documentation File Restrictions**
+
+- **NEVER create documentation files (`.md`, `.pdf`, etc.) unless explicitly requested by the user**
+- **ONLY create `.md` files when:**
+  1. User explicitly asks for documentation
+  2. Creating a README.md for a new project/repository (standard practice)
+  3. User requests a specific documentation file by name
+  
+- **DO NOT create documentation files for:**
+  - Implementation summaries (use code comments instead)
+  - Progress updates (communicate directly in chat)
+  - Status reports (communicate directly in chat)
+  - Migration summaries (use code comments or git commit messages)
+  - Feature documentation (use code comments and docstrings)
+  - API documentation (use code comments, docstrings, or OpenAPI/Swagger)
+
+- **If documentation is needed, prefer:**
+  - Code comments and docstrings
+  - README.md updates (only if necessary)
+  - Inline documentation in code
+  - Git commit messages
+
+- **Exception:** The `docs/archive/` folder exists for historical documentation, but even there, only create files when explicitly requested
+
+**This rule applies to ALL repositories and ALL folders in the workspace.**
+
+## 📚 General Best Practices
+
+- Write clear, descriptive commit messages
+- Keep commits focused and atomic
+- Test before committing
+- Review diffs before pushing
+- Use meaningful variable names
+- Document security considerations
+
+## 🔧 Script Management
+
+**CRITICAL: Script Organization and Duplication Prevention**
+
+- **NEVER create duplicate scripts** - Always update existing scripts instead of creating new ones with similar names (e.g., `import-ethiopia-feeds.js`, `import-ethiopia-feeds-direct.js`, `import-ethiopia-feeds-with-variations.js`)
+- **Keep all utility/import scripts in dedicated folders:**
+  - `scripts/` folder for one-off imports, migrations, utilities
+  - `scripts/import/` for data import scripts
+  - `scripts/migration/` for database migration scripts
+  - `scripts/utils/` for utility scripts
+- **Before creating a new script:**
+  1. Check if a similar script already exists
+  2. If it exists, UPDATE it instead of creating a new one
+  3. If you must create a new one, use clear, descriptive names and document why it's different
+- **Script naming convention:**
+  - Use kebab-case: `import-vietnam-feeds.js`
+  - Include purpose: `migrate-countries-to-new-db.js`
+  - Avoid version suffixes: Don't use `-v2`, `-new`, `-updated` in filenames
+- **Clean up temporary/test scripts** after use
+- **Production scripts** should be in `scripts/` folder, NOT in root or mixed with app code
+
+## 🔒 Security Reminders
+
+- Credentials exposed in git history are permanently accessible
+- GitHub scans repositories for exposed secrets
+- Always rotate credentials after exposure
+- Use strong, unique passwords for each service
+- Enable 2FA on all accounts
+
