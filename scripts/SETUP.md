@@ -37,16 +37,19 @@
 
 1. **Connect to Railway PostgreSQL:**
    - Use Railway's database console or connect via `psql`
-   - Connection string: `postgresql://postgres:lQJdVGMpMYaKhPaOpgSxIfQoKwwSKbsC@postgres-f55f407f.railway.internal:5432/railway`
+   - Get connection string from Railway Dashboard → PostgreSQL → Connect → Public Network
+   - **NEVER commit connection strings to version control!**
 
 2. **Run migration SQL:**
    ```bash
-   psql "postgresql://postgres:lQJdVGMpMYaKhPaOpgSxIfQoKwwSKbsC@postgres-f55f407f.railway.internal:5432/railway" < migrations/001_initial_schema.sql
+   # Get DATABASE_URL from Railway Dashboard
+   psql "$DATABASE_URL" < migrations/001_initial_schema.sql
    ```
 
 3. **Import Excel data:**
    ```bash
-   DATABASE_URL="postgresql://postgres:lQJdVGMpMYaKhPaOpgSxIfQoKwwSKbsC@postgres-f55f407f.railway.internal:5432/railway" npm run import
+   # Set DATABASE_URL from Railway Dashboard (public connection string)
+   DATABASE_URL="your-connection-string-from-railway" npm run import
    ```
 
 ## Notes
